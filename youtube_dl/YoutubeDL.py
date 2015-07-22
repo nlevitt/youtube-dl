@@ -247,6 +247,7 @@ class YoutubeDL(object):
                        If it returns None, the video is downloaded.
                        match_filter_func in utils.py is one example for this.
     no_color:          Do not emit color codes in output.
+    extra_http_headers: Extra http headers to include with every request.
 
     The following options determine which downloader is picked:
     external_downloader: Executable of the external downloader to call.
@@ -1719,14 +1720,19 @@ class YoutubeDL(object):
         url = req if req_is_string else req.get_full_url()
         url_escaped = escape_url(url)
 
-        # Substitute URL if any change after escaping
-        if url != url_escaped:
+        headers = self.params.get('extra_http_headers')
+
+        # Substitute URL if any change after escaping, and/or add extra http
+        # request headers
+        if url != url_escaped or headers:
             if req_is_string:
-                req = url_escaped
+                req = compat_urllib_request.Request(url=url_escaped, headers=headers)
             else:
                 req_type = HEADRequest if req.get_method() == 'HEAD' else compat_urllib_request.Request
+                if req.headers:
+                    headers.update(req.headers)
                 req = req_type(
-                    url_escaped, data=req.data, headers=req.headers,
+                    url_escaped, data=req.data, headers=headers,
                     origin_req_host=req.origin_req_host, unverifiable=req.unverifiable)
 
         return self._opener.open(req, timeout=self._socket_timeout)

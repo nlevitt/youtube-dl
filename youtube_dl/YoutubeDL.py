@@ -1730,6 +1730,7 @@ class YoutubeDL(object):
             else:
                 req_type = HEADRequest if req.get_method() == 'HEAD' else compat_urllib_request.Request
                 if req.headers:
+                    headers = headers.copy()
                     headers.update(req.headers)
                 req = req_type(
                     url_escaped, data=req.data, headers=headers,

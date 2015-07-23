@@ -1720,20 +1720,14 @@ class YoutubeDL(object):
         url = req if req_is_string else req.get_full_url()
         url_escaped = escape_url(url)
 
-        headers = self.params.get('extra_http_headers')
-
-        # Substitute URL if any change after escaping, and/or add extra http
-        # request headers
-        if url != url_escaped or headers:
+        # Substitute URL if any change after escaping
+        if url != url_escaped:
             if req_is_string:
-                req = compat_urllib_request.Request(url=url_escaped, headers=headers)
+                req = url_escaped
             else:
                 req_type = HEADRequest if req.get_method() == 'HEAD' else compat_urllib_request.Request
-                if req.headers:
-                    headers = headers.copy()
-                    headers.update(req.headers)
                 req = req_type(
-                    url_escaped, data=req.data, headers=headers,
+                    url_escaped, data=req.data, headers=req.headers,
                     origin_req_host=req.origin_req_host, unverifiable=req.unverifiable)
 
         return self._opener.open(req, timeout=self._socket_timeout)

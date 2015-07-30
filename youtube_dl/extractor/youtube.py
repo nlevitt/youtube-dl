@@ -33,9 +33,11 @@ from ..utils import (
     int_or_none,
     orderedSet,
     parse_duration,
+    smuggle_url,
     str_to_int,
     unescapeHTML,
     unified_strdate,
+    unsmuggle_url,
     uppercase_escape,
     ISO3166Utils,
 )
@@ -329,6 +331,7 @@ class YoutubeIE(YoutubeBaseInfoExtractor):
                 'upload_date': '20121002',
                 'description': 'test chars:  "\'/\\ä↭𝕐\ntest URL: https://github.com/rg3/youtube-dl/issues/1892\n\nThis is a test video for youtube-dl.\n\nFor more information, contact phihag@phihag.de .',
                 'categories': ['Science & Technology'],
+                'tags': ['youtube-dl'],
                 'like_count': int,
                 'dislike_count': int,
                 'start_time': 1,
@@ -343,7 +346,10 @@ class YoutubeIE(YoutubeBaseInfoExtractor):
                 'ext': 'mp4',
                 'upload_date': '20120506',
                 'title': 'Icona Pop - I Love It (feat. Charli XCX) [OFFICIAL VIDEO]',
-                'description': 'md5:fea86fda2d5a5784273df5c7cc994d9f',
+                'description': 'md5:782e8651347686cba06e58f71ab51773',
+                'tags': ['Icona Pop i love it', 'sweden', 'pop music', 'big beat records', 'big beat', 'charli',
+                         'xcx', 'charli xcx', 'girls', 'hbo', 'i love it', "i don't care", 'icona', 'pop',
+                         'iconic ep', 'iconic', 'love', 'it'],
                 'uploader': 'Icona Pop',
                 'uploader_id': 'IconaPop',
             }
@@ -558,6 +564,59 @@ class YoutubeIE(YoutubeBaseInfoExtractor):
                 'format': '135',  # bestvideo
             }
         },
+        {
+            # Multifeed videos (multiple cameras), URL is for Main Camera
+            'url': 'https://www.youtube.com/watch?v=jqWvoWXjCVs',
+            'info_dict': {
+                'id': 'jqWvoWXjCVs',
+                'title': 'teamPGP: Rocket League Noob Stream',
+                'description': 'md5:dc7872fb300e143831327f1bae3af010',
+            },
+            'playlist': [{
+                'info_dict': {
+                    'id': 'jqWvoWXjCVs',
+                    'ext': 'mp4',
+                    'title': 'teamPGP: Rocket League Noob Stream (Main Camera)',
+                    'description': 'md5:dc7872fb300e143831327f1bae3af010',
+                    'upload_date': '20150721',
+                    'uploader': 'Beer Games Beer',
+                    'uploader_id': 'beergamesbeer',
+                },
+            }, {
+                'info_dict': {
+                    'id': '6h8e8xoXJzg',
+                    'ext': 'mp4',
+                    'title': 'teamPGP: Rocket League Noob Stream (kreestuh)',
+                    'description': 'md5:dc7872fb300e143831327f1bae3af010',
+                    'upload_date': '20150721',
+                    'uploader': 'Beer Games Beer',
+                    'uploader_id': 'beergamesbeer',
+                },
+            }, {
+                'info_dict': {
+                    'id': 'PUOgX5z9xZw',
+                    'ext': 'mp4',
+                    'title': 'teamPGP: Rocket League Noob Stream (grizzle)',
+                    'description': 'md5:dc7872fb300e143831327f1bae3af010',
+                    'upload_date': '20150721',
+                    'uploader': 'Beer Games Beer',
+                    'uploader_id': 'beergamesbeer',
+                },
+            }, {
+                'info_dict': {
+                    'id': 'teuwxikvS5k',
+                    'ext': 'mp4',
+                    'title': 'teamPGP: Rocket League Noob Stream (zim)',
+                    'description': 'md5:dc7872fb300e143831327f1bae3af010',
+                    'upload_date': '20150721',
+                    'uploader': 'Beer Games Beer',
+                    'uploader_id': 'beergamesbeer',
+                },
+            }],
+            'params': {
+                'skip_download': True,
+            },
+        }
     ]
 
     def __init__(self, *args, **kwargs):
@@ -889,6 +948,8 @@ class YoutubeIE(YoutubeBaseInfoExtractor):
         return formats
 
     def _real_extract(self, url):
+        url, smuggled_data = unsmuggle_url(url, {})
+
         proto = (
             'http' if self._downloader.params.get('prefer_insecure', False)
             else 'https')
@@ -1005,6 +1066,55 @@ class YoutubeIE(YoutubeBaseInfoExtractor):
                     '"token" parameter not in video info for unknown reason',
                     video_id=video_id)
 
+        # title
+        if 'title' in video_info:
+            video_title = video_info['title'][0]
+        else:
+            self._downloader.report_warning('Unable to extract video title')
+            video_title = '_'
+
+        # description
+        video_description = get_element_by_id("eow-description", video_webpage)
+        if video_description:
+            video_description = re.sub(r'''(?x)
+                <a\s+
+                    (?:[a-zA-Z-]+="[^"]+"\s+)*?
+                    title="([^"]+)"\s+
+                    (?:[a-zA-Z-]+="[^"]+"\s+)*?
+                    class="yt-uix-redirect-link"\s*>
+                [^<]+
+                </a>
+            ''', r'\1', video_description)
+            video_description = clean_html(video_description)
+        else:
+            fd_mobj = re.search(r'<meta name="description" content="([^"]+)"', video_webpage)
+            if fd_mobj:
+                video_description = unescapeHTML(fd_mobj.group(1))
+            else:
+                video_description = ''
+
+        if 'multifeed_metadata_list' in video_info and not smuggled_data.get('force_singlefeed', False):
+            if not self._downloader.params.get('noplaylist'):
+                entries = []
+                feed_ids = []
+                multifeed_metadata_list = compat_urllib_parse_unquote_plus(video_info['multifeed_metadata_list'][0])
+                for feed in multifeed_metadata_list.split(','):
+                    feed_data = compat_parse_qs(feed)
+                    entries.append({
+                        '_type': 'url_transparent',
+                        'ie_key': 'Youtube',
+                        'url': smuggle_url(
+                            '%s://www.youtube.com/watch?v=%s' % (proto, feed_data['id'][0]),
+                            {'force_singlefeed': True}),
+                        'title': '%s (%s)' % (video_title, feed_data['title'][0]),
+                    })
+                    feed_ids.append(feed_data['id'][0])
+                self.to_screen(
+                    'Downloading multifeed video (%s) - add --no-playlist to just download video %s'
+                    % (', '.join(feed_ids), video_id))
+                return self.playlist_result(entries, video_id, video_title, video_description)
+            self.to_screen('Downloading just video %s because of --no-playlist' % video_id)
+
         if 'view_count' in video_info:
             view_count = int(video_info['view_count'][0])
         else:
@@ -1029,13 +1139,6 @@ class YoutubeIE(YoutubeBaseInfoExtractor):
             video_uploader_id = mobj.group(1)
         else:
             self._downloader.report_warning('unable to extract uploader nickname')
-
-        # title
-        if 'title' in video_info:
-            video_title = video_info['title'][0]
-        else:
-            self._downloader.report_warning('Unable to extract video title')
-            video_title = '_'
 
         # thumbnail image
         # We try first to get a high quality image:
@@ -1072,25 +1175,9 @@ class YoutubeIE(YoutubeBaseInfoExtractor):
         else:
             video_categories = None
 
-        # description
-        video_description = get_element_by_id("eow-description", video_webpage)
-        if video_description:
-            video_description = re.sub(r'''(?x)
-                <a\s+
-                    (?:[a-zA-Z-]+="[^"]+"\s+)*?
-                    title="([^"]+)"\s+
-                    (?:[a-zA-Z-]+="[^"]+"\s+)*?
-                    class="yt-uix-redirect-link"\s*>
-                [^<]+
-                </a>
-            ''', r'\1', video_description)
-            video_description = clean_html(video_description)
-        else:
-            fd_mobj = re.search(r'<meta name="description" content="([^"]+)"', video_webpage)
-            if fd_mobj:
-                video_description = unescapeHTML(fd_mobj.group(1))
-            else:
-                video_description = ''
+        video_tags = [
+            unescapeHTML(m.group('content'))
+            for m in re.finditer(self._meta_regex('og:video:tag'), video_webpage)]
 
         def _extract_count(count_name):
             return str_to_int(self._search_regex(
@@ -1260,6 +1347,7 @@ class YoutubeIE(YoutubeBaseInfoExtractor):
             'thumbnail': video_thumbnail,
             'description': video_description,
             'categories': video_categories,
+            'tags': video_tags,
             'subtitles': video_subtitles,
             'automatic_captions': automatic_captions,
             'duration': video_duration,

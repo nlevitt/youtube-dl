@@ -14,10 +14,12 @@ import xml.etree.ElementTree
 
 from ..compat import (
     compat_cookiejar,
+    compat_cookies,
     compat_HTTPError,
     compat_http_client,
     compat_urllib_error,
     compat_urllib_parse_urlparse,
+    compat_urllib_request,
     compat_urlparse,
     compat_str,
 )
@@ -181,6 +183,7 @@ class InfoExtractor(object):
                     by YoutubeDL if it's missing)
     categories:     A list of categories that the video falls in, for example
                     ["Sports", "Berlin"]
+    tags:           A list of tags assigned to the video, e.g. ["sweden", "pop music"]
     is_live:        True, False, or None (=unknown). Whether this video is a
                     live stream that goes on instead of a fixed-length video.
     start_time:     Time in seconds where the reproduction should start, as
@@ -630,6 +633,12 @@ class InfoExtractor(object):
             template % (content_re, property_re),
         ]
 
+    @staticmethod
+    def _meta_regex(prop):
+        return r'''(?isx)<meta
+                    (?=[^>]+(?:itemprop|name|property)=(["\']?)%s\1)
+                    [^>]+?content=(["\'])(?P<content>.*?)\2''' % re.escape(prop)
+
     def _og_search_property(self, prop, html, name=None, **kargs):
         if name is None:
             name = 'OpenGraph %s' % prop
@@ -660,9 +669,7 @@ class InfoExtractor(object):
         if display_name is None:
             display_name = name
         return self._html_search_regex(
-            r'''(?isx)<meta
-                    (?=[^>]+(?:itemprop|name|property)=(["\']?)%s\1)
-                    [^>]+?content=(["\'])(?P<content>.*?)\2''' % re.escape(name),
+            self._meta_regex(name),
             html, display_name, fatal=fatal, group='content', **kwargs)
 
     def _dc_search_uploader(self, html):
@@ -1068,6 +1075,12 @@ class InfoExtractor(object):
             0, name, value, None, None, domain, None,
             None, '/', True, False, expire_time, '', None, None, None)
         self._downloader.cookiejar.set_cookie(cookie)
+
+    def _get_cookies(self, url):
+        """ Return a compat_cookies.SimpleCookie with the cookies for the url """
+        req = compat_urllib_request.Request(url)
+        self._downloader.cookiejar.add_cookie_header(req)
+        return compat_cookies.SimpleCookie(req.get_header('Cookie'))
 
     def get_testcases(self, include_onlymatching=False):
         t = getattr(self, '_TEST', None)

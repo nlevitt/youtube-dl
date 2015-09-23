@@ -122,7 +122,6 @@
  - **defense.gouv.fr**
  - **DHM**: Filmarchiv - Deutsches Historisches Museum
  - **Discovery**
- - **divxstage**: DivxStage
  - **Dotsub**
  - **DouyuTV**: 斗鱼
  - **dramafever**
@@ -150,6 +149,7 @@
  - **EroProfile**
  - **Escapist**
  - **ESPN** (Currently broken)
+ - **EsriVideo**
  - **EveryonesMixtape**
  - **exfm**: ex.fm
  - **ExpoTV**
@@ -165,7 +165,7 @@
  - **Folketinget**: Folketinget (ft.dk; Danish parliament)
  - **FootyRoom**
  - **Foxgay**
- - **FoxNews**
+ - **FoxNews**: Fox News and Fox Business Video
  - **FoxSports**
  - **france2.fr:generation-quoi**
  - **FranceCulture**
@@ -194,7 +194,7 @@
  - **GodTube**
  - **GoldenMoustache**
  - **Golem**
- - **GorillaVid**: GorillaVid.in, daclips.in, movpod.in, fastvideo.in and realvid.net
+ - **GorillaVid**: GorillaVid.in, daclips.in, movpod.in, fastvideo.in, realvid.net and filehoot.com
  - **Goshgay**
  - **Groupon**
  - **Hark**
@@ -219,7 +219,10 @@
  - **imdb**: Internet Movie Database trailers
  - **imdb:list**: Internet Movie Database lists
  - **Imgur**
+ - **ImgurAlbum**
  - **Ina**
+ - **Indavideo**
+ - **IndavideoEmbed**
  - **InfoQ**
  - **Instagram**
  - **instagram:user**: Instagram user profile
@@ -282,7 +285,7 @@
  - **Minhateca**
  - **MinistryGrid**
  - **miomio.tv**
- - **mitele.es**
+ - **MiTele**: mitele.es
  - **mixcloud**
  - **MLB**
  - **MoeVideo**: LetitBit video services: moevideo.net, playreplay.net and videochart.net
@@ -298,20 +301,21 @@
  - **Moviezine**
  - **movshare**: MovShare
  - **MPORA**
+ - **MSNBC**
  - **MTV**
+ - **mtv.de**
  - **mtviggy.com**
  - **mtvservices:embedded**
  - **MuenchenTV**: münchen.tv
  - **MusicPlayOn**
- - **MusicVault**
  - **muzu.tv**
+ - **Mwave**
  - **MySpace**
  - **MySpace:album**
  - **MySpass**
  - **Myvi**
  - **myvideo**
  - **MyVidster**
- - **N-JOY**
  - **n-tv.de**
  - **NationalGeographic**
  - **Naver**
@@ -320,7 +324,9 @@
  - **NBCNews**
  - **NBCSports**
  - **NBCSportsVPlayer**
- - **ndr**: NDR.de - Mediathek
+ - **ndr**: NDR.de - Norddeutscher Rundfunk
+ - **ndr:embed**
+ - **ndr:embed:base**
  - **NDTV**
  - **NerdCubedFeed**
  - **Nerdist**
@@ -343,12 +349,16 @@
  - **nhl.com:videocenter**: NHL videocenter category
  - **niconico**: ニコニコ動画
  - **NiconicoPlaylist**
+ - **njoy**: N-JOY
+ - **njoy:embed**
  - **Noco**
  - **Normalboots**
  - **NosVideo**
  - **Nova**: TN.cz, Prásk.tv, Nova.cz, Novaplus.cz, FANDA.tv, Krásná.cz and Doma.cz
  - **novamov**: NovaMov
- - **Nowness**
+ - **nowness**
+ - **nowness:playlist**
+ - **nowness:series**
  - **NowTV**
  - **nowvideo**: NowVideo
  - **npo**: npo.nl and ntr.nl
@@ -369,7 +379,6 @@
  - **OnionStudios**
  - **Ooyala**
  - **OoyalaExternal**
- - **OpenFilm**
  - **orf:fm4**: radio FM4
  - **orf:iptv**: iptv.ORF.at
  - **orf:oe1**: Radio Österreich 1
@@ -386,8 +395,11 @@
  - **PlanetaPlay**
  - **play.fm**
  - **played.to**
+ - **Playtvak**: Playtvak.cz, iDNES.cz and Lidovky.cz
  - **Playvid**
  - **Playwire**
+ - **pluralsight**
+ - **pluralsight:course**
  - **plus.google**: Google Plus
  - **pluzz.francetv.fr**
  - **podomatic**
@@ -432,6 +444,7 @@
  - **rtve.es:alacarta**: RTVE a la carta
  - **rtve.es:infantil**: RTVE infantil
  - **rtve.es:live**: RTVE.es live streams
+ - **RTVNH**
  - **RUHD**
  - **rutube**: Rutube videos
  - **rutube:channel**: Rutube channels
@@ -455,7 +468,8 @@
  - **ServingSys**
  - **Sexu**
  - **SexyKarma**: Sexy Karma and Watch Indian Porn
- - **Shared**
+ - **Shahid**
+ - **Shared**: shared.sx and vivo.sx
  - **ShareSix**
  - **Sina**
  - **Slideshare**
@@ -519,7 +533,7 @@
  - **techtv.mit.edu**
  - **ted**
  - **TeleBruxelles**
- - **telecinco.es**
+ - **Telecinco**: telecinco.es, cuatro.com and mediaset.es
  - **Telegraaf**
  - **TeleMB**
  - **TeleTask**
@@ -528,6 +542,7 @@
  - **TF1**
  - **TheOnion**
  - **ThePlatform**
+ - **ThePlatformFeed**
  - **TheSixtyOne**
  - **ThisAmericanLife**
  - **ThisAV**
@@ -593,7 +608,6 @@
  - **Viddler**
  - **video.google:search**: Google Video search
  - **video.mit.edu**
- - **VideoBam**
  - **VideoDetective**
  - **videofy.me**
  - **videolectures.net**
@@ -621,6 +635,7 @@
  - **vine:user**
  - **vk**: VK
  - **vk:uservideos**: VK - User's Videos
+ - **vlive**
  - **Vodlocker**
  - **VoiceRepublic**
  - **Vporn**
